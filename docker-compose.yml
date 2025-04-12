@@ -1,0 +1,28 @@
+version: '3.11'
+
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: restoplace_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  web:
+    build: .
+    command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 8000
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/restoplace_db
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
